@@ -75,6 +75,14 @@ Apply corrections in:
 
 ---
 
+## Broader Industry Reference
+
+For wider hospitality industry terminology beyond the Duetto-specific map above — including distribution, sales, inventory, pricing, and forecasting terms — see [`references/industry-terminology.md`](references/industry-terminology.md).
+
+Duetto's canonical map always takes precedence where the two conflict.
+
+---
+
 ## Examples
 
 **AG Grid — narrow column uses abbreviation; RevPAR always stays RevPAR:**
