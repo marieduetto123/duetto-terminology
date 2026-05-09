@@ -14,23 +14,40 @@ description: >
 
 # Duetto Terminology Enforcer
 
-Duetto has a canonical set of abbreviations and display terms for hospitality metrics. These are used consistently across all products, documentation, and UI. When incorrect forms appear — in code strings, column headers, variable names, comments, or docs — fix them.
+Duetto has canonical terms for hospitality metrics. Two rules govern how they appear:
+
+1. **RevPAR** — always written as `RevPAR`, in every context, with no exceptions. Never abbreviated further, never written as RevPar, Revpar, REVPAR, etc.
+2. **All other metrics** — use the full term when space allows; fall back to the abbreviation only in space-constrained contexts (tight column headers, compact labels, small UI cells).
 
 ---
 
-## Canonical Terminology Map
+## Canonical Terms
 
-| Wrong (any of these) | Correct |
-|---|---|
-| RevPar, revpar, REVPAR, rev par, Rev Par | **RevPAR** |
-| Pickup, Pick Up, Pick-up, Pick-Up, pickup, pick_up | **PU** |
-| Average Lead Time, Avg Lead Time, Avg. Lead Time, avg_lead_time | **ALT** |
-| Average Adults, Avg Adults, Avg. Adults, avg_adults | **AD** |
-| Average Children, Avg Children, Avg. Children, avg_children | **CHD** |
-| Total Guests, Total Guest, total_guests | **PAX** |
-| Available Rooms, Avail Rooms, Avail. Rooms, avail_rooms | **AR** |
+| Full term (default) | Abbreviation (space-constrained only) | Wrong forms to fix |
+|---|---|---|
+| **RevPAR** | *(none — always RevPAR)* | RevPar, revpar, REVPAR, rev par, Rev Par |
+| **Pickup** | **PU** | Pick Up, Pick-up, Pick-Up, pick_up |
+| **Average Lead Time** | **ALT** | Avg Lead Time, Avg. Lead Time, avg_lead_time |
+| **Average Adults** | **AD** | Avg Adults, Avg. Adults, avg_adults |
+| **Average Children** | **CHD** | Avg Children, Avg. Children, avg_children |
+| **Total Guests** | **PAX** | Total Guest, total_guests |
+| **Available Rooms** | **AR** | Avail Rooms, Avail. Rooms, avail_rooms |
 
-**RevPAR note:** The correct form is always `RevPAR` — never abbreviated further. It is not shortened to anything else. The most common mistake is wrong capitalisation (`RevPar`, `Revpar`).
+---
+
+## When to use full vs. abbreviated form
+
+**Use the full term** (default) for:
+- Tooltip text, modal labels, sidebar labels, form field labels
+- Documentation, comments, markdown
+- Any label or heading with generous width
+
+**Use the abbreviation** only when:
+- The column or cell is explicitly narrow/fixed-width (e.g. a compact AG Grid column)
+- The UI container makes the full term visually cramped or truncated
+- The surrounding columns already establish an abbreviation-only convention
+
+**RevPAR never follows this rule** — it is always `RevPAR` regardless of context.
 
 ---
 
@@ -39,65 +56,52 @@ Duetto has a canonical set of abbreviations and display terms for hospitality me
 Apply corrections in:
 - **UI display strings** — column headers, labels, tooltips, placeholder text
 - **Code comments**
-- **Object/variable names** where the metric name is the identifier (e.g. `avgLeadTime` → `alt`, `totalGuests` → `pax`, `pickupData` → `puData`)
 - **AG Grid `headerName` fields**
 - **HTML text content**
 - **Documentation and markdown**
-
-Use judgment for variable names — rename when the metric term is the primary meaning of the identifier. Don't rename if it would break external contracts (API response keys, localStorage keys, shared interfaces you don't own).
+- **Variable/object names** where the metric term is the primary identifier — rename when safe (don't rename API response keys, localStorage keys, or shared interfaces you don't own)
 
 ---
 
 ## Workflow
 
-1. **Identify the scope.** If the user points at specific files, scan those. For the TravelCore RM Hub project, the relevant files are:
-   - `travelcore-rm-hub.html`
-   - `travelcore-rm-hub.css`
-   - `travelcore-rm-hub.js`
+1. **Identify the scope.** Scan the files the user points at, or the current working directory if none are specified.
 
-2. **Grep for all wrong forms** before making any edits. Build a complete list of what needs to change.
+2. **Grep for all wrong forms** before making any edits.
 
-3. **Apply corrections** file by file. For each file, make all replacements in a single pass.
+3. **Apply corrections** file by file, choosing full vs. abbreviated form based on context.
 
-4. **Report what changed.** After editing, produce a concise summary:
-   - List each replacement made (wrong form → correct form, file, count)
-   - Flag any cases where you held back (e.g. API key you didn't rename) and why
+4. **Report what changed** — list each replacement (wrong form → correct form, file, count) and flag any cases where you held back and why.
 
 ---
 
 ## Examples
 
-**AG Grid column header:**
+**AG Grid — narrow column uses abbreviation; RevPAR always stays RevPAR:**
 ```js
 // Before
-{ field: 'revPar', headerName: 'RevPar' }
-{ field: 'pickup', headerName: 'Pickup' }
+{ field: 'revPar',      headerName: 'RevPar' }
+{ field: 'pickup',      headerName: 'Pickup' }
 { field: 'avgLeadTime', headerName: 'Avg Lead Time' }
 
-// After
-{ field: 'revPar', headerName: 'RevPAR' }
-{ field: 'pickup', headerName: 'PU' }
-{ field: 'avgLeadTime', headerName: 'ALT' }
+// After (narrow/compact grid)
+{ field: 'revPar',      headerName: 'RevPAR' }       // always RevPAR
+{ field: 'pickup',      headerName: 'PU' }            // abbreviated — narrow column
+{ field: 'avgLeadTime', headerName: 'ALT' }           // abbreviated — narrow column
+
+// After (wide/spacious grid)
+{ field: 'revPar',      headerName: 'RevPAR' }        // still always RevPAR
+{ field: 'pickup',      headerName: 'Pickup' }        // full term — space available
+{ field: 'avgLeadTime', headerName: 'Average Lead Time' }
 ```
 
-**HTML label:**
+**Tooltip / label (always full term):**
 ```html
 <!-- Before -->
-<span>Total Guests</span>
-<th>Available Rooms</th>
+<span title="Total Guests">PAX</span>
+<label>Avg Adults</label>
 
 <!-- After -->
-<span>PAX</span>
-<th>AR</th>
-```
-
-**Variable rename (when safe):**
-```js
-// Before
-const avgAdults = row.averageAdults;
-const totalGuests = summary.totalGuests;
-
-// After
-const ad = row.averageAdults;     // display-side variable renamed; source key unchanged
-const pax = summary.totalGuests;  // same
+<span title="Total Guests">Total Guests</span>
+<label>Average Adults</label>
 ```
